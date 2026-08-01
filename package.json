@@ -1,0 +1,38 @@
+{
+  "name": "coms3011a-todo-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "nextconfig.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nonkululeko316/coms3011a-todo-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/nonkululeko316/coms3011a-todo-app/issues"
+  },
+  "homepage": "https://github.com/nonkululeko316/coms3011a-todo-app#readme",
+  "dependencies": {
+    "better-sqlite3": "^13.0.2",
+    "next": "^16.2.12",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "supertest": "^7.2.2"
+  }
+}
