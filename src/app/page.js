@@ -6,11 +6,24 @@ export default function Home() {
   const [sortBy, setSortBy] = useState('due_date');
   const [form, setForm] = useState({ title: '', description: '', due_date: '', topic: '' });
   const [editingId, setEditingId] = useState(null);
+  const [showArchived, setShowArchived] = useState(false);
+  const [archivedTasks, setArchivedTasks] = useState([]);
 
   async function loadTasks() {
     const res = await fetch(`/api/tasks?sort=${sortBy}`);
     const data = await res.json();
     setTasks(data);
+  }
+
+  async function loadArchivedTasks() {
+    const res = await fetch('/api/tasks/archived');
+    const data = await res.json();
+    setArchivedTasks(data);
+  }
+
+  function toggleArchived() {
+    if (!showArchived) loadArchivedTasks();
+    setShowArchived(!showArchived);
   }
 
   useEffect(() => { loadTasks(); }, [sortBy]);
@@ -123,6 +136,10 @@ export default function Home() {
         <option value="status">Status</option>
       </select>
 
+      <button onClick={toggleArchived} style={{ marginLeft: '1rem' }}>
+        {showArchived ? 'Hide Archived' : 'View Archived'}
+      </button>
+
       <section aria-label="Task list">
         <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem' }}>
           {tasks.map(task => (
@@ -160,6 +177,29 @@ export default function Home() {
           ))}
         </ul>
       </section>
+
+      {showArchived && (
+        <section aria-label="Archived tasks" style={{ marginTop: '1.5rem' }}>
+          <h2>Archived Tasks</h2>
+          <ul style={{ listStyle: 'none', padding: 0 }}>
+            {archivedTasks.map(task => (
+              <li key={task.id} style={{
+                border: '1px solid #ccc',
+                padding: '0.75rem',
+                marginBottom: '0.5rem',
+                background: '#f0f0f0',
+                color: '#666',
+              }}>
+                <strong>{task.title}</strong>
+                <div>{task.description}</div>
+                <div>Due: {task.due_date} | Topic: {task.topic} | Status: {task.status}</div>
+                <div style={{ fontSize: '0.85em' }}>Archived: {task.archived_at}</div>
+              </li>
+            ))}
+          </ul>
+          {archivedTasks.length === 0 && <p>No archived tasks.</p>}
+        </section>
+      )}
     </div>
   );
 }
