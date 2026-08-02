@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createTask, listTasks } from '../../../lib/tasks.js';
 
-export async function GET() {
-  const tasks = listTasks();
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const sortBy = searchParams.get('sort');
+  const tasks = listTasks(sortBy);
   return NextResponse.json(tasks);
 }
 
