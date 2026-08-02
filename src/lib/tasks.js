@@ -1,16 +1,23 @@
 import { getDb } from '../../db/client.js';
 
-export function createTask({ title, description, due_date, topic }) {
+export function updateTask(id, updates) {
   const db = getDb();
-  const stmt = db.prepare(`
-    INSERT INTO tasks (title, description, due_date, topic)
-    VALUES (?, ?, ?, ?)
-  `);
-  const info = stmt.run(title, description, due_date, topic);
-  return db.prepare('SELECT * FROM tasks WHERE id = ?').get(info.lastInsertRowid);
-}
+  const existing = db.prepare('SELECT * FROM tasks WHERE id = ?').get(id);
+  if (!existing) return null;
 
-export function listTasks() {
-  const db = getDb();
-  return db.prepare('SELECT * FROM tasks WHERE archived_at IS NULL').all();
+  const { title, description, due_date, topic, status } = updates;
+  db.prepare(`
+    UPDATE tasks
+    SET title = ?, description = ?, due_date = ?, topic = ?, status = ?, updated_at = datetime('now')
+    WHERE id = ?
+  `).run(
+    title ?? existing.title,
+    description ?? existing.description,
+    due_date ?? existing.due_date,
+    topic ?? existing.topic,
+    status ?? existing.status,
+    id
+  );
+
+  return db.prepare('SELECT * FROM tasks WHERE id = ?').get(id);
 }
