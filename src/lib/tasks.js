@@ -56,3 +56,8 @@ export function archiveTask(id) {
 
   return db.prepare('SELECT * FROM tasks WHERE id = ?').get(id);
 }
+
+export function listArchivedTasks() {
+  const db = getDb();
+  return db.prepare('SELECT * FROM tasks WHERE archived_at IS NOT NULL ORDER BY archived_at DESC').all();
+}
