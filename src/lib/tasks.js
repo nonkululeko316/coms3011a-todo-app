@@ -14,7 +14,13 @@ export function listTasks(sortBy) {
   const db = getDb();
   const allowedSorts = { topic: 'topic', status: 'status', due_date: 'due_date' };
   const column = allowedSorts[sortBy] || 'due_date';
-  return db.prepare(`SELECT * FROM tasks WHERE archived_at IS NULL ORDER BY ${column}`).all();
+  const tasks = db.prepare(`SELECT * FROM tasks WHERE archived_at IS NULL ORDER BY ${column}`).all();
+
+  const today = new Date().toISOString().split('T')[0];
+  return tasks.map(task => ({
+    ...task,
+    isOverdue: task.status !== 'complete' && task.due_date < today,
+  }));
 }
 
 export function updateTask(id, updates) {
