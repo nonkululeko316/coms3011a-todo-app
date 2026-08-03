@@ -6,7 +6,7 @@ export function createTask({ title, description, due_date, topic }) {
     INSERT INTO tasks (title, description, due_date, topic)
     VALUES (?, ?, ?, ?)
   `);
-  const info = stmt.run(title, description, due_date, topic);
+  const info = stmt.run(title, description ?? null, due_date, topic);
   return db.prepare('SELECT * FROM tasks WHERE id = ?').get(info.lastInsertRowid);
 }
 

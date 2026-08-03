@@ -14,7 +14,7 @@
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "jest": {
-  "testEnvironment": "node"
+    "testEnvironment": "node"
   },
   "repository": {
     "type": "git",
@@ -29,7 +29,6 @@
   },
   "homepage": "https://github.com/nonkululeko316/coms3011a-todo-app#readme",
   "dependencies": {
-    "better-sqlite3": "^13.0.2",
     "next": "^16.2.12",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
@@ -37,5 +36,8 @@
   "devDependencies": {
     "jest": "^30.4.2",
     "supertest": "^7.2.2"
+  },
+  "engines": {
+  "node": ">=22.13.0"
   }
 }
