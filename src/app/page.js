@@ -1,6 +1,36 @@
 'use client';
 import { useState, useEffect } from 'react';
 
+// Signature status indicator: a leaf that fills as a task progresses.
+// todo = outline only, in-progress = half-filled, complete = fully filled.
+function LeafIcon({ status }) {
+  const fillLevel = status === 'complete' ? 1 : status === 'in-progress' ? 0.5 : 0;
+  const fillColor = status === 'complete' ? '#4CAF50' : '#A3C9A8';
+
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" className="leaf-icon" aria-hidden="true">
+      <path
+        d="M12 2C7 4 3 8 3 14c0 4 3.5 7 9 8 5.5-1 9-4 9-8 0-6-4-10-9-12z"
+        fill="none"
+        stroke="#8FA893"
+        strokeWidth="1.4"
+      />
+      {fillLevel > 0 && (
+        <clipPath id={`clip-${status}`}>
+          <rect x="0" y={24 - 24 * fillLevel} width="24" height="24" />
+        </clipPath>
+      )}
+      {fillLevel > 0 && (
+        <path
+          d="M12 2C7 4 3 8 3 14c0 4 3.5 7 9 8 5.5-1 9-4 9-8 0-6-4-10-9-12z"
+          fill={fillColor}
+          clipPath={`url(#clip-${status})`}
+        />
+      )}
+    </svg>
+  );
+}
+
 export default function Home() {
   const [tasks, setTasks] = useState([]);
   const [sortBy, setSortBy] = useState('due_date');
@@ -78,126 +108,134 @@ export default function Home() {
   }
 
   return (
-    <div style={{ maxWidth: 700, margin: '2rem auto', fontFamily: 'sans-serif' }}>
-      <h1>Todo App</h1>
+    <div className="page">
+      <header className="page-header">
+        <h1>Todo</h1>
+        <p>Local-first task tracking, one leaf at a time.</p>
+      </header>
 
-      <form onSubmit={handleSubmit} style={{ marginBottom: '2rem' }}>
+      <form onSubmit={handleSubmit} className="card form-card">
         <fieldset>
-          <legend>{editingId ? 'Edit Task' : 'New Task'}</legend>
+          <legend>{editingId ? 'Edit task' : 'New task'}</legend>
 
-          <label htmlFor="title">Title</label><br />
-          <input
-            id="title"
-            placeholder="Title"
-            value={form.title}
-            onChange={e => setForm({ ...form, title: e.target.value })}
-            required
-          /><br />
+          <div className="field">
+            <label htmlFor="title">Title</label>
+            <input
+              id="title"
+              value={form.title}
+              onChange={e => setForm({ ...form, title: e.target.value })}
+              required
+            />
+          </div>
 
-          <label htmlFor="description">Description</label><br />
-          <input
-            id="description"
-            placeholder="Description"
-            value={form.description}
-            onChange={e => setForm({ ...form, description: e.target.value })}
-          /><br />
+          <div className="field">
+            <label htmlFor="description">Description</label>
+            <input
+              id="description"
+              value={form.description}
+              onChange={e => setForm({ ...form, description: e.target.value })}
+            />
+          </div>
 
-          <label htmlFor="due_date">Due Date</label><br />
-          <input
-            id="due_date"
-            type="date"
-            value={form.due_date}
-            onChange={e => setForm({ ...form, due_date: e.target.value })}
-            required
-          /><br />
+          <div className="field-row">
+            <div className="field">
+              <label htmlFor="due_date">Due date</label>
+              <input
+                id="due_date"
+                type="date"
+                value={form.due_date}
+                onChange={e => setForm({ ...form, due_date: e.target.value })}
+                required
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="topic">Topic</label>
+              <input
+                id="topic"
+                value={form.topic}
+                onChange={e => setForm({ ...form, topic: e.target.value })}
+                required
+              />
+            </div>
+          </div>
 
-          <label htmlFor="topic">Topic</label><br />
-          <input
-            id="topic"
-            placeholder="Topic"
-            value={form.topic}
-            onChange={e => setForm({ ...form, topic: e.target.value })}
-            required
-          /><br />
-
-          <button type="submit">{editingId ? 'Save Edit' : 'Create Task'}</button>
+          <button type="submit" className="btn btn-primary">
+            {editingId ? 'Save changes' : 'Add task'}
+          </button>
           {editingId && (
-            <button type="button" onClick={cancelEdit} style={{ marginLeft: '0.5rem' }}>
+            <button type="button" onClick={cancelEdit} className="btn btn-ghost" style={{ marginLeft: '0.5rem' }}>
               Cancel
             </button>
           )}
         </fieldset>
       </form>
 
-      <label htmlFor="sort">Sort by: </label>
-      <select id="sort" value={sortBy} onChange={e => setSortBy(e.target.value)}>
-        <option value="due_date">Due Date</option>
-        <option value="topic">Topic</option>
-        <option value="status">Status</option>
-      </select>
-
-      <button onClick={toggleArchived} style={{ marginLeft: '1rem' }}>
-        {showArchived ? 'Hide Archived' : 'View Archived'}
-      </button>
+      <div className="toolbar">
+        <label htmlFor="sort">Sort by</label>
+        <select id="sort" value={sortBy} onChange={e => setSortBy(e.target.value)}>
+          <option value="due_date">Due date</option>
+          <option value="topic">Topic</option>
+          <option value="status">Status</option>
+        </select>
+        <button onClick={toggleArchived} className="btn btn-ghost btn-small" style={{ marginLeft: 'auto' }}>
+          {showArchived ? 'Hide archived' : 'View archived'}
+        </button>
+      </div>
 
       <section aria-label="Task list">
-        <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem' }}>
+        <ul className="task-list">
           {tasks.map(task => (
-            <li key={task.id} style={{
-              border: '1px solid #ccc',
-              padding: '0.75rem',
-              marginBottom: '0.5rem',
-              background: task.isOverdue ? '#ffe5e5' : 'white',
-            }}>
-              <strong>{task.title}</strong>{' '}
-              {task.isOverdue && <span style={{ color: 'red' }}>OVERDUE</span>}
-              <div>{task.description}</div>
-              <div>Due: {task.due_date} | Topic: {task.topic}</div>
-
-              <label htmlFor={`status-${task.id}`} style={{ marginRight: '0.5rem' }}>
-                Status:
-              </label>
-              <select
-                id={`status-${task.id}`}
-                value={task.status}
-                onChange={e => updateStatus(task.id, e.target.value)}
-              >
-                <option value="todo">Todo</option>
-                <option value="in-progress">In Progress</option>
-                <option value="complete">Complete</option>
-              </select>
-
-              <button onClick={() => startEdit(task)} aria-label={`Edit ${task.title}`}>
-                Edit
-              </button>
-              <button onClick={() => archiveTask(task.id)} aria-label={`Archive ${task.title}`}>
-                Archive
-              </button>
+            <li key={task.id} className={`task-card${task.isOverdue ? ' is-overdue' : ''}`}>
+              <LeafIcon status={task.status} />
+              <div className="task-body">
+                <div className="task-top">
+                  <span className="task-title">{task.title}</span>
+                  {task.isOverdue && <span className="overdue-tag">Overdue</span>}
+                </div>
+                {task.description && <p className="task-desc">{task.description}</p>}
+                <div className="task-meta">Due {task.due_date} · {task.topic}</div>
+                <div className="task-controls">
+                  <label htmlFor={`status-${task.id}`} style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>
+                    Status
+                  </label>
+                  <select
+                    id={`status-${task.id}`}
+                    value={task.status}
+                    onChange={e => updateStatus(task.id, e.target.value)}
+                  >
+                    <option value="todo">Todo</option>
+                    <option value="in-progress">In progress</option>
+                    <option value="complete">Complete</option>
+                  </select>
+                  <button onClick={() => startEdit(task)} className="btn btn-ghost btn-small" aria-label={`Edit ${task.title}`}>
+                    Edit
+                  </button>
+                  <button onClick={() => archiveTask(task.id)} className="btn btn-ghost btn-small" aria-label={`Archive ${task.title}`}>
+                    Archive
+                  </button>
+                </div>
+              </div>
             </li>
           ))}
+          {tasks.length === 0 && <p className="empty-note">No active tasks yet — add one above.</p>}
         </ul>
       </section>
 
       {showArchived && (
-        <section aria-label="Archived tasks" style={{ marginTop: '1.5rem' }}>
-          <h2>Archived Tasks</h2>
-          <ul style={{ listStyle: 'none', padding: 0 }}>
+        <section aria-label="Archived tasks" className="archived-section">
+          <h2>Archived</h2>
+          <ul className="task-list">
             {archivedTasks.map(task => (
-              <li key={task.id} style={{
-                border: '1px solid #ccc',
-                padding: '0.75rem',
-                marginBottom: '0.5rem',
-                background: '#f0f0f0',
-                color: '#666',
-              }}>
-                <strong>{task.title}</strong>
-                <div>{task.description}</div>
-                <div>Due: {task.due_date} | Topic: {task.topic} | Status: {task.status}</div>
-                <div style={{ fontSize: '0.85em' }}>Archived: {task.archived_at}</div>
+              <li key={task.id} className="archived-card">
+                <div className="archived-title">{task.title}</div>
+                {task.description && <div>{task.description}</div>}
+                <div className="archived-meta">
+                  Due {task.due_date} · {task.topic} · {task.status} · archived {task.archived_at}
+                </div>
               </li>
             ))}
           </ul>
-          {archivedTasks.length === 0 && <p>No archived tasks.</p>}
+          {archivedTasks.length === 0 && <p className="empty-note">No archived tasks.</p>}
         </section>
       )}
     </div>
