@@ -11,7 +11,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "jest"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "jest": {
+  "testEnvironment": "node"
   },
   "repository": {
     "type": "git",

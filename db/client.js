@@ -2,7 +2,7 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
 
-export function getDb(dbPath = path.join(process.cwd(), 'data', 'todo.db')) {
+export function getDb(dbPath = process.env.TEST_DB_PATH || path.join(process.cwd(), 'data', 'todo.db')) {
   const dir = path.dirname(dbPath);
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
